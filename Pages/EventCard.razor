@@ -1,0 +1,42 @@
+@using CS_FS04.Pages
+@using CS_FS04.Shared
+@* Componente Tarjeta de Evento para EventEase *@
+@if (Event != null && !string.IsNullOrWhiteSpace(Event.Name) && Event.Date > DateTime.MinValue && !string.IsNullOrWhiteSpace(Event.Location))
+{
+    <div class="event-card">
+        <h3>@Event.Name</h3>
+        <p><strong>Fecha:</strong> @Event.Date.ToString("dd/MM/yyyy")</p>
+        <p><strong>Ubicación:</strong> @Event.Location</p>
+        <a class="btn btn-primary" href="eventdetails/@Event.Id">Ver Detalles</a>
+        <a class="btn btn-secondary" href="register/@Event.Id">Registrarse</a>
+    </div>
+}
+else if (Event == null)
+{
+    <div class="event-card invalid">
+        <p>No se encontró información del evento. Por favor, contacte al administrador.</p>
+    </div>
+}
+else if (string.IsNullOrWhiteSpace(Event.Name))
+{
+    <div class="event-card invalid">
+        <p>El nombre del evento es obligatorio.</p>
+    </div>
+}
+else if (Event.Date <= DateTime.MinValue)
+{
+    <div class="event-card invalid">
+        <p>La fecha del evento no es válida.</p>
+    </div>
+}
+else if (string.IsNullOrWhiteSpace(Event.Location))
+{
+    <div class="event-card invalid">
+        <p>La ubicación del evento es obligatoria.</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EventModel Event { get; set; }
+}

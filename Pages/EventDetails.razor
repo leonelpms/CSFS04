@@ -1,0 +1,31 @@
+@page "/eventdetails/{EventId:int}"
+@using CS_FS04.Shared
+@using System.Linq
+@* Página de detalles del evento *@
+@{
+    var evento = Events.FirstOrDefault(e => e.Id == EventId);
+}
+@if (evento != null)
+{
+    <h2>@evento.Name</h2>
+    <p><strong>Fecha:</strong> @evento.Date.ToString("dd/MM/yyyy")</p>
+    <p><strong>Ubicación:</strong> @evento.Location</p>
+    <a class="btn btn-secondary" href="/register/@evento.Id">Registrarse</a>
+    <a class="btn btn-link" href="/events">Volver a la lista</a>
+}
+else
+{
+    <p>Evento no encontrado.</p>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    List<EventModel> Events = new List<EventModel>
+    {
+        new EventModel { Id = 1, Name = "Conferencia Tech 2025", Date = new DateTime(2025, 6, 10), Location = "Madrid" },
+        new EventModel { Id = 2, Name = "Gala Empresarial", Date = new DateTime(2025, 7, 5), Location = "Barcelona" },
+        new EventModel { Id = 3, Name = "Networking Creativo", Date = new DateTime(2025, 8, 20), Location = "Valencia" }
+    };
+}

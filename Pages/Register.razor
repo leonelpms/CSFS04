@@ -1,0 +1,76 @@
+@page "/register/{EventId:int}"
+@using CS_FS04.Shared
+@inject NavigationManager Navigation
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
+@using System.ComponentModel.DataAnnotations
+
+<h2>Registro para el evento</h2>
+@if (evento != null)
+{
+    <p><strong>Evento:</strong> @evento.Name</p>
+    <p><strong>Fecha:</strong> @evento.Date.ToString("dd/MM/yyyy")</p>
+    <p><strong>Ubicación:</strong> @evento.Location</p>
+    <EditForm Model="registro" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div>
+            <label>Nombre:</label>
+            <InputText @bind-Value="registro.Nombre" class="form-control" />
+            <ValidationMessage For="() => registro.Nombre" />
+        </div>
+        <div>
+            <label>Email:</label>
+            <InputText @bind-Value="registro.Email" class="form-control" />
+            <ValidationMessage For="() => registro.Email" />
+        </div>
+        <button type="submit" class="btn btn-primary">Registrarse</button>
+    </EditForm>
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info mt-2">@mensaje</div>
+    }
+    <a class="btn btn-link" href="/events">Volver a la lista</a>
+}
+else
+{
+    <p>Evento no encontrado.</p>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    EventModel? evento;
+    RegistroModel registro = new();
+    string mensaje = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        // Simulación: buscar evento (en real, usar servicio)
+        var eventos = new List<EventModel>
+        {
+            new EventModel { Id = 1, Name = "Conferencia Tech 2025", Date = new DateTime(2025, 6, 10), Location = "Madrid" },
+            new EventModel { Id = 2, Name = "Gala Empresarial", Date = new DateTime(2025, 7, 5), Location = "Barcelona" },
+            new EventModel { Id = 3, Name = "Networking Creativo", Date = new DateTime(2025, 8, 20), Location = "Valencia" }
+        };
+        evento = eventos.FirstOrDefault(e => e.Id == EventId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Guardar registro en sesión
+        var key = $"asistencia_{EventId}";
+        await SessionStorage.SetAsync(key, registro);
+        mensaje = "¡Registro exitoso! Su asistencia ha sido registrada para este evento.";
+    }
+
+    public class RegistroModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El correo electrónico no es válido.")]
+        public string Email { get; set; } = string.Empty;
+    }
+}
